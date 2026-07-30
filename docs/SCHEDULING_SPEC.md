@@ -2,9 +2,13 @@
 
 ## 1. Objective
 
-Select the fairest eligible 20-member roster for each Blue Battlefield date without rewarding low latency, fast hardware, or repeated signup-button spam.
+Select the fairest eligible 20-member roster for each Blue Battlefield date
+without rewarding low latency, fast hardware, or signup-button spam.
 
-## 2. Daily roster
+## 2. Event calendar and roster
+
+Blue Battlefield signup events run on six days each week: Sunday through Friday.
+Saturday is the guild off day and the scheduler must reject Saturday events.
 
 | Assignment | Slots |
 |---|---:|
@@ -13,77 +17,88 @@ Select the fairest eligible 20-member roster for each Blue Battlefield date with
 | Player Ship | 12 |
 | **Total** | **20** |
 
-A signup may list multiple acceptable assignments, but a member can receive only one assignment on a date.
+A signup may list multiple acceptable assignments, but a member can receive only
+one assignment on a date.
 
 ## 3. Attendance credits
 
-Attendance credits represent daily priority units.
+- One eligible daily absence earns one unit.
+- One unit applies to one future event date.
+- A member can request and spend at most one unit on a date.
+- An absence never guarantees multiple days.
+- An available requested unit is the first ranking factor for an eligible role.
+- A unit is deducted only when the member receives a confirmed assignment.
+- A waitlisted, rejected, withdrawn, or cancelled signup does not consume a unit.
+- A member cannot earn and spend a unit for the same event date.
+- Imported absences are unique by member ID and source event date.
+- Corrections must record actor, timestamp, reason, and before/after value.
 
-- One eligible absence earns one unit.
-- One unit can be applied to one signup date.
-- No more than one unit can be spent by a member on a date.
-- Applying a unit increases priority for that date only.
-- A spent unit is deducted only when the member receives a confirmed roster slot.
-- A waitlisted or cancelled signup does not consume a unit.
-- A member cannot earn and spend a unit for the same date.
-- Leadership corrections must be logged with actor, timestamp, reason, and before/after values.
-- Imported historical absences must be date-based so duplicate rows cannot mint duplicate units.
+“Guaranteed” means the unit outranks candidates without an applied unit. It does
+not bypass role eligibility, deadline, active-status, duplicate-assignment, or
+capacity rules. If more credited eligible candidates request a role than it has
+seats, the remaining fairness factors order those credited candidates.
 
 ## 4. Eligibility
 
 A candidate is eligible only when all are true:
 
-1. The signup was submitted before the deadline.
-2. The member is not already assigned on that date.
-3. The member selected the role or owns an accepted ship for the role.
-4. Any leadership-defined readiness requirement is met.
-5. The account is active and not suspended from signup.
+1. The signup was submitted by the deadline.
+2. The member is active and not suspended.
+3. The member selected an eligible role.
+4. A ship volunteer selected an accepted ship.
+5. A NOL flag is used only on a NOL-compatible ship.
+6. The member is not already assigned on that date.
+7. Any published leadership readiness requirement is met.
 
-Signup timestamp never contributes points. It is retained only for audit and deadline enforcement.
+Signup timestamp is retained for audit and deadline enforcement only.
 
-## 5. Selection order
+## 5. Selection
 
-Selection is role-constrained rather than one global top-20 list:
+The scheduler fills roles independently:
 
-1. Rank eligible Guild Galley Driver volunteers; select 1.
-2. Rank eligible Guild Galley Cannon volunteers; select 7.
-3. Rank eligible Ship volunteers; select 12.
-4. Put remaining eligible volunteers into an ordered waitlist for the assignment.
-5. If an assignment lacks candidates, apply the published reassignment policy and rerun validation.
+1. Rank Guild Galley Driver volunteers and select up to 1.
+2. Exclude assigned members, rank Guild Galley Cannon volunteers, and select up to 7.
+3. Exclude assigned members, rank Player Ship volunteers, and select up to 12.
+4. Publish remaining eligible volunteers as ordered per-role waitlists.
 
-## 6. Priority model
+An undersubscribed role remains visibly unfilled until a published substitution
+or reassignment policy is configured. The engine must not silently change the
+7/1/12 composition.
 
-Version 1 uses lexicographic ranking to keep guarantees and fairness interpretable:
+## 6. Ranking policy
 
-1. **Applied attendance credit:** applied first; maximum one.
-2. **Recent selection deficit:** fewer confirmed appearances in the rolling window ranks higher.
-3. **Recent waitlist history:** more recent valid waitlists rank higher.
-4. **Rotation value:** deterministic rotating tiebreak derived from member ID and event date.
+Version 1 uses lexicographic ranking:
 
-This is intentionally not a hidden weighted sum. A lower-level factor cannot silently overpower an applied attendance credit.
+1. Requested and available attendance credit
+2. Fewer confirmed appearances in the rolling window
+3. More valid waitlists in the rolling window
+4. Deterministic rotating value derived from member ID, event date, and role
 
-Suggested initial rolling window: 14 completed battlefield dates. This remains configurable and must be displayed alongside every published ranking.
+The initial rolling window is 14 completed event dates and remains configurable.
+Ship class, ship tier, Carrack variant, NOL ownership, and signup timestamp never
+contribute priority.
 
-## 7. Ship types
+## 7. Ship eligibility
 
-Accepted signup values:
+Standard and NOL options:
 
 - Carrack: Balance
-- Carrack: Balance with NOL
 - Carrack: Advance
-- Carrack: Advance with NOL
 - Carrack: Valor
-- Carrack: Valor with NOL
 - Carrack: Volante
-- Carrack: Volante with NOL
 - Panokseon
-- Panokseon with NOL
+
+Standard option only:
+
+- Improved Epheria Sailboat
+- Improved Epheria Frigate
+- Epheria Caravel
+- Epheria Galleass
 - Epheria Star
-- Epheria Star with NOL
 
-No other ship type is eligible for a Ship position. In particular, the scheduler must reject Improved Sailboat, Improved Frigate, Caravel, Galleass, and free-form or leadership-approved “other” ships.
-
-The data model stores the base ship type, Carrack variant when applicable, and NOL status as separate fields. The signup interface displays both the standard and `with NOL` choice for every accepted ship and Carrack variant. It must not assume that all eligible ship types are equivalent for future composition rules.
+The model stores base ship/variant and NOL capability separately. It must not
+invent NOL choices for ships that do not generally have one. Every accepted ship
+is equally eligible for one of the 12 Player Ship positions.
 
 ## 8. Required records
 
@@ -92,70 +107,63 @@ The data model stores the base ship type, Carrack variant when applicable, and N
 - immutable member ID
 - Discord ID
 - family/display name
-- active status
+- active/suspended status
 - eligible roles
-- owned ship types
+- owned ships and capabilities
 - readiness flags
 
 ### Event
 
 - event date
-- signup open/deadline timestamps
+- signup-open and deadline timestamps
 - status
-- scoring-policy version
+- policy version
 
 ### Signup
 
-- member ID
-- event date
+- member ID and event date
 - acceptable roles
-- ship offered
-- attendance-credit requested
-- submitted timestamp
-- status
+- offered ship and NOL flag
+- attendance-credit request
+- submitted timestamp and status
 
 ### Attendance ledger
 
-- member ID
-- source event date
+- member ID and source event date
 - entry type: earned, spent, correction, expired
-- units
-- reason
-- related signup/event
+- units, reason, related event/signup
 - actor and timestamp
 
 ### Assignment
 
-- event date
-- member ID
-- assignment type
-- selection rank
-- score components
+- event date, member ID, role
+- role rank and score components
 - confirmed/attended/no-show status
 
 ## 9. Audit output
 
-Every scheduled member and waitlisted member receives an explanation containing:
+Each considered candidate receives:
 
-- assignment considered
-- whether a credit was applied
-- rolling confirmed appearances
-- recent valid waitlists
-- rotation value
-- eligibility failures, if any
+- role considered
+- selection/waitlist/rejection result and rank
+- whether a credit was requested, available, and spent
+- rolling confirmed appearances and valid waitlists
+- deterministic rotation value
+- eligibility failure reasons
 - policy version
 
-## 10. Acceptance tests
+## 10. Acceptance criteria
 
-1. Twenty slots are produced only as 7 cannon, 1 driver, and 12 ship assignments.
-2. No member appears twice on one date.
-3. Two imports of the same absence row create only one earned unit.
-4. Two absences produce two units, but only one can be applied per future date.
-5. A waitlisted signup never spends its requested unit.
-6. A selected signup spends exactly one requested unit.
-7. Signup timestamp does not alter rank among on-time signups.
-8. Identical candidates resolve deterministically and rotate over time.
-9. A member cannot be assigned to an ineligible role or unaccepted ship.
-10. Every accepted ship and Carrack variant has both standard and with-NOL choices.
-11. Improved Sailboat, Improved Frigate, Caravel, Galleass, and “other” ships are rejected.
-12. Every outcome exposes its score components and policy version.
+1. Events are available Sunday through Friday and reject Saturday.
+2. A complete roster is exactly 7 cannon, 1 driver, and 12 ship assignments.
+3. No member appears twice on one date.
+4. Duplicate absence imports create only one unit per member/source date.
+5. Multiple absences create multiple units, but at most one is spent per future date.
+6. Waitlisted or rejected candidates do not spend requested credits.
+7. A selected candidate with an available requested credit spends exactly one.
+8. Signup time cannot alter ranking among on-time signups.
+9. Identical inputs produce identical results; tie ordering rotates by event date.
+10. Ineligible roles, ships, NOL combinations, and late signups are rejected.
+11. All listed ships remain eligible, with NOL only where specified.
+12. Ship tier, variant, and NOL never change ranking.
+13. Every selection and waitlist outcome exposes ranking factors and policy version.
