@@ -76,8 +76,22 @@ an event date.
 - [`data/attendance-template.csv`](data/attendance-template.csv): Excel-compatible
   attendance import template
 
+## UI prototype
+
+The repository includes a responsive, dependency-free interface prototype:
+
+```bash
+python -m http.server 8000 --directory ui
+```
+
+Then open `http://localhost:8000`. The prototype demonstrates weekly availability,
+conditional ship/NOL choices, precommitted standby selection, published rosters,
+private fairness explanations, and leadership coverage controls. See
+[`docs/UI_DISCORD_SPEC.md`](docs/UI_DISCORD_SPEC.md) for the shared Discord/web
+interaction contract.
+
 ## Current boundary
 
-This release implements and tests the domain engine. Persistence, Discord
-components, leadership controls, and live roster publication remain the next
-integration phase.
+This release implements and tests the domain engine and validates the first UI
+information architecture. Persistence, live Discord interactions, authentication,
+and roster publication remain the next integration phase.
