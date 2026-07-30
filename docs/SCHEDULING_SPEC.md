@@ -69,16 +69,16 @@ or reassignment policy is configured. The engine must not silently change the
 
 Version 1 uses lexicographic ranking:
 
-1. Requested and available attendance credit
-2. Fewer confirmed appearances across all completed historical event dates
-3. Fewer confirmed appearances in the recent rolling window
-4. More valid waitlists across all completed historical event dates
-5. More valid waitlists in the recent rolling window
-6. Deterministic rotating value derived from member ID, event date, and role
+1. Requested and available attendance credit earned in the same calendar month
+2. Fewer confirmed appearances earlier in that calendar month
+3. More valid waitlists earlier in that calendar month
+4. Deterministic rotating value derived from member ID, event date, and role
 
-Lifetime totals never expire or fall out of the fairness calculation. The recent
-window is a secondary anti-streak measure, initially 14 completed event dates and
-configurable. Only events before the schedule being generated may be counted.
+The fairness cycle is one calendar month in the guild's configured timezone. At
+00:00 on the first day of a month, selection counts, waitlist counts, and
+spendable attendance-credit balances begin at zero. Prior-month records remain
+permanently available for audit and reports but never affect the new month's
+ranking. Only events before the schedule being generated may be counted.
 Ship class, ship tier, Carrack variant, NOL ownership, and signup timestamp never
 contribute priority.
 
@@ -134,8 +134,9 @@ is equally eligible for one of the 12 Player Ship positions.
 ### Attendance ledger
 
 The ledger is append-only and retains every historical BBF outcome needed to
-reconstruct lifetime fairness. Corrections supersede prior entries; they do not
-delete history.
+reconstruct each monthly fairness cycle. Corrections supersede prior entries;
+they do not delete history. Credits are keyed to the calendar month in which the
+eligible absence occurred and cannot be spent in a later month.
 
 - member ID and source event date
 - entry type: earned, spent, correction, expired
@@ -155,8 +156,8 @@ Each considered candidate receives:
 - role considered
 - selection/waitlist/rejection result and rank
 - whether a credit was requested, available, and spent
-- lifetime confirmed appearances and valid waitlists
-- recent-window confirmed appearances and valid waitlists
+- current-month confirmed appearances and valid waitlists
+- monthly cycle identifier
 - deterministic rotation value
 - eligibility failure reasons
 - policy version
@@ -176,5 +177,6 @@ Each considered candidate receives:
 11. All listed ships remain eligible, with NOL only where specified.
 12. Ship tier, variant, and NOL never change ranking.
 13. Every selection and waitlist outcome exposes ranking factors and policy version.
-14. Attendance older than the recent window still affects ranking through lifetime totals.
-15. Replaying the complete ledger reproduces the same lifetime totals and selection result.
+14. Earlier attendance in the same month affects ranking regardless of its age within that month.
+15. Prior-month attendance and unused credits do not affect a new month's ranking.
+16. Replaying the complete ledger reproduces the same monthly totals and selection result.
