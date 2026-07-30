@@ -24,11 +24,11 @@ or attendance rules.
 - Define typed member, event, signup, role, ship, assignment, and ledger records.
 - Validate deadlines, active status, roles, ships, NOL compatibility, and Saturday.
 - Select independently by role in driver, cannon, then ship order.
-- Rank lexicographically by requested available credit, lifetime selection deficit,
-  recent selection deficit, lifetime waitlists, recent waitlists, and deterministic
-  rotating tie-break.
-- Retain every historical attendance outcome; never discard older dates from the
-  lifetime fairness totals.
+- Rank lexicographically by requested available current-month credit, fewer
+  current-month selections, more current-month waitlists, and deterministic rotation.
+- Reset all ranking totals and spendable credits on the first of each calendar month.
+- Retain prior-month outcomes permanently for audit, reporting, and policy review,
+  while excluding them from the new monthly fairness cycle.
 - Ignore signup time after deadline validation.
 - Emit selected assignments, ordered waitlists, rejections, and score explanations.
 
@@ -49,8 +49,9 @@ Success criterion: repeated imports cannot mint repeated attendance credits.
 - Test credit priority and one-unit-per-day spending.
 - Test that waitlisted candidates retain their requested credit.
 - Test signup-speed neutrality and deterministic rotation.
-- Test that attendance outside the recent window still changes lifetime priority.
-- Test full-ledger replay and correction history produce reproducible totals.
+- Test that every earlier date in the same month changes monthly priority.
+- Test that prior-month attendance and unused credits cannot affect the new month.
+- Test full-ledger replay and correction history produce reproducible monthly totals.
 - Test every eligible ship and NOL compatibility rule.
 - Test six-day scheduling by rejecting Saturdays.
 
