@@ -130,6 +130,36 @@ class SchedulerTests(unittest.TestCase):
             sum(assignment.member_id == "m00" for assignment in result.assignments), 1
         )
 
+    def test_attendance_outside_recent_window_still_affects_lifetime_fairness(self) -> None:
+        members = [member(i, frozenset({Role.DRIVER})) for i in range(2)]
+        old_date = EVENT.event_date - timedelta(days=90)
+        history = {"m00": AttendanceHistory(confirmed_dates=frozenset({old_date}))}
+        result = Scheduler(rolling_window_days=14).schedule(
+            EVENT,
+            members,
+            [signup(0, Role.DRIVER), signup(1, Role.DRIVER)],
+            AttendanceLedger(),
+            history,
+        )
+        self.assertEqual(result.assignments[0].member_id, "m01")
+        explanation = next(
+            item for item in result.explanations if item.member_id == "m00"
+        )
+        self.assertEqual(explanation.total_confirmed, 1)
+        self.assertEqual(explanation.confirmed_in_window, 0)
+
+    def test_future_history_never_affects_current_ranking(self) -> None:
+        members = [member(i, frozenset({Role.DRIVER})) for i in range(2)]
+        future_date = EVENT.event_date + timedelta(days=1)
+        history = {"m00": AttendanceHistory(confirmed_dates=frozenset({future_date}))}
+        baseline = Scheduler().schedule(
+            EVENT, members, [signup(0, Role.DRIVER), signup(1, Role.DRIVER)], AttendanceLedger()
+        )
+        with_future = Scheduler().schedule(
+            EVENT, members, [signup(0, Role.DRIVER), signup(1, Role.DRIVER)], AttendanceLedger(), history
+        )
+        self.assertEqual(baseline.assignments[0].member_id, with_future.assignments[0].member_id)
+
     def test_saturday_is_rejected(self) -> None:
         with self.assertRaises(ValueError):
             Event(date(2026, 8, 1), DEADLINE)
