@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#111827" />
+    <title>Blue Battlefield Scheduler</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="#" aria-label="Blue Battlefield home">
+          <span class="brand-mark">BB</span>
+          <span><strong>Blue Battlefield</strong><small>Guild Scheduler</small></span>
+        </a>
+        <nav aria-label="Main navigation">
+          <button class="nav-item active" data-view="availability"><span>▦</span> My week</button>
+          <button class="nav-item" data-view="roster"><span>♜</span> Published roster</button>
+          <button class="nav-item" data-view="fairness"><span>◎</span> My fairness</button>
+          <div class="nav-section">Leadership</div>
+          <button class="nav-item" data-view="dashboard"><span>◇</span> Week dashboard</button>
+        </nav>
+        <div class="sidebar-card">
+          <small>Current fairness cycle</small>
+          <strong>July 2026</strong>
+          <span>Resets August 1</span>
+        </div>
+        <div class="member-chip">
+          <span class="avatar">CE</span>
+          <span><strong>Christopher</strong><small>Guild member</small></span>
+        </div>
+      </aside>
+
+      <main>
+        <header class="topbar">
+          <button class="mobile-menu" aria-label="Open menu">☰</button>
+          <div>
+            <span class="eyebrow">WEEK OF JULY 26–31</span>
+            <h1 id="page-title">Plan your BBF week</h1>
+          </div>
+          <div class="deadline">
+            <span class="status-dot"></span>
+            <span><small>Signup closes</small><strong>Friday · 8:00 PM ET</strong></span>
+          </div>
+        </header>
+
+        <section class="view active" id="availability">
+          <div class="intro-row">
+            <p>Declare the dates you can attend before the deadline. Signup time never affects priority.</p>
+            <button class="ghost-button" id="copy-week">Copy last week</button>
+          </div>
+
+          <div class="notice">
+            <span>✓</span>
+            <div><strong>Your plans are saved as a draft.</strong><br /><small>Submit the full week when you are ready to commit.</small></div>
+          </div>
+
+          <div class="week-grid" id="week-grid"></div>
+
+          <div class="commitment-card">
+            <label class="check-row">
+              <input type="checkbox" id="commitment" />
+              <span>I understand that submitting means I am committing to attend any date for which I am scheduled.</span>
+            </label>
+            <div class="commitment-footer">
+              <span><strong id="available-count">0</strong> dates available · <strong id="standby-count">0</strong> standby dates</span>
+              <button class="primary-button" id="submit-week" disabled>Submit weekly availability</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="roster">
+          <div class="section-heading">
+            <div><span class="eyebrow">PUBLISHED SCHEDULE</span><h2>Wednesday, July 29</h2></div>
+            <span class="locked-pill">🔒 Locked</span>
+          </div>
+          <div class="roster-summary">
+            <div><strong>20 / 20</strong><span>Seats filled</span></div>
+            <div><strong>7</strong><span>Galley cannons</span></div>
+            <div><strong>1</strong><span>Galley driver</span></div>
+            <div><strong>12</strong><span>Player ships</span></div>
+          </div>
+          <div class="roster-columns">
+            <article class="panel">
+              <div class="panel-title"><h3>Guild Galley</h3><span>8 players</span></div>
+              <div class="roster-list" id="galley-list"></div>
+            </article>
+            <article class="panel">
+              <div class="panel-title"><h3>Player Ships</h3><span>12 players</span></div>
+              <div class="roster-list" id="ship-list"></div>
+            </article>
+          </div>
+          <article class="panel waitlist-panel">
+            <div class="panel-title"><h3>Precommitted standbys</h3><span>Promoted in this order by compatible role</span></div>
+            <div class="standby-list" id="published-standbys"></div>
+          </article>
+        </section>
+
+        <section class="view" id="fairness">
+          <div class="section-heading">
+            <div><span class="eyebrow">PRIVATE TO YOU</span><h2>Your July fairness record</h2></div>
+            <button class="ghost-button">View policy</button>
+          </div>
+          <div class="metric-grid">
+            <article class="metric"><span>Scheduled</span><strong>3</strong><small>of 7 available dates</small></article>
+            <article class="metric"><span>Waitlisted</span><strong>2</strong><small>valid monthly outcomes</small></article>
+            <article class="metric"><span>Credits</span><strong>1</strong><small>available this month</small></article>
+            <article class="metric"><span>Attendance</span><strong>100%</strong><small>3 of 3 scheduled</small></article>
+          </div>
+          <article class="explanation-card">
+            <div class="explanation-icon">◎</div>
+            <div>
+              <span class="eyebrow">WHY YOU WERE SCHEDULED</span>
+              <h3>Ship · Wednesday, July 29</h3>
+              <p>You had fewer completed appearances than 8 other eligible ship volunteers. Your two valid waitlists then placed you ahead of members with the same attendance count. Signup time and ship tier were not considered.</p>
+              <div class="factor-row"><span>1 · No credit requested</span><span>2 · 2 prior appearances</span><span>3 · 2 waitlists</span><span>4 · Rotation 18</span></div>
+            </div>
+          </article>
+          <article class="panel ledger">
+            <div class="panel-title"><h3>Monthly activity</h3><span>Permanent audit history</span></div>
+            <div class="ledger-row ledger-head"><span>Date</span><span>Outcome</span><span>Role</span><span>Fairness impact</span></div>
+            <div class="ledger-row"><span>Jul 29</span><span class="outcome selected">Scheduled</span><span>Ship</span><span>+1 appearance after attendance</span></div>
+            <div class="ledger-row"><span>Jul 24</span><span class="outcome attended">Attended</span><span>Cannon</span><span>Counted in July total</span></div>
+            <div class="ledger-row"><span>Jul 22</span><span class="outcome waitlisted">Waitlisted</span><span>Ship</span><span>+1 waitlist</span></div>
+          </article>
+        </section>
+
+        <section class="view" id="dashboard">
+          <div class="section-heading">
+            <div><span class="eyebrow">LEADERSHIP VIEW</span><h2>Weekly readiness</h2></div>
+            <button class="primary-button">Generate six rosters</button>
+          </div>
+          <div class="metric-grid">
+            <article class="metric"><span>Members submitted</span><strong>34</strong><small>6 drafts remain</small></article>
+            <article class="metric"><span>Unfilled seats</span><strong>3</strong><small>across six dates</small></article>
+            <article class="metric"><span>Role conflicts</span><strong>2</strong><small>need leadership review</small></article>
+            <article class="metric"><span>Deadline</span><strong>1d 5h</strong><small>Friday at 8:00 PM ET</small></article>
+          </div>
+          <article class="panel coverage-panel">
+            <div class="panel-title"><h3>Seat coverage by day</h3><span>7 cannon · 1 driver · 12 ship required</span></div>
+            <div id="coverage-table"></div>
+          </article>
+          <div class="leadership-actions">
+            <article class="action-card"><span>↥</span><div><strong>Import attendance</strong><small>Preview an Excel-compatible CSV before committing.</small></div><button>Open</button></article>
+            <article class="action-card"><span>⚖</span><div><strong>Review fairness audit</strong><small>See every factor, override, and policy version.</small></div><button>Open</button></article>
+            <article class="action-card"><span>✎</span><div><strong>Record outcomes</strong><small>Mark attendance, eligible absence, or no-show.</small></div><button>Open</button></article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="day-dialog">
+      <form method="dialog" id="day-form">
+        <div class="dialog-header">
+          <div><span class="eyebrow">DAILY PREFERENCES</span><h2 id="dialog-title">Sunday, July 26</h2></div>
+          <button class="icon-button" value="cancel" aria-label="Close">×</button>
+        </div>
+        <label class="field-label">Rank the roles you can perform</label>
+        <div class="role-options">
+          <label><input type="checkbox" name="role" value="Cannon" /><span>Cannon<small>Guild Galley · 7 seats</small></span></label>
+          <label><input type="checkbox" name="role" value="Driver" /><span>Driver<small>Guild Galley · 1 seat</small></span></label>
+          <label><input type="checkbox" name="role" value="Ship" /><span>Player Ship<small>Your eligible vessel · 12 seats</small></span></label>
+        </div>
+        <div class="conditional-fields" id="ship-fields" hidden>
+          <label>Ship
+            <select id="ship-select">
+              <option value="">Select your ship</option>
+              <option>Carrack: Balance</option><option>Carrack: Advance</option>
+              <option>Carrack: Valor</option><option>Carrack: Volante</option>
+              <option>Panokseon</option><option>Improved Epheria Sailboat</option>
+              <option>Improved Epheria Frigate</option><option>Epheria Caravel</option>
+              <option>Epheria Galleass</option><option>Epheria Star</option>
+            </select>
+          </label>
+          <label class="check-row nol-row"><input type="checkbox" id="nol-check" /><span>Equipped with NOL</span></label>
+          <small id="nol-help">NOL is available only for compatible ships.</small>
+        </div>
+        <div class="preference-hint">Roles are ranked in the order selected. Drag-and-drop ranking will be added in the connected app.</div>
+        <label class="check-row"><input type="checkbox" id="standby-check" /><span>I can be a precommitted standby for this date.</span></label>
+        <label class="check-row credit-row"><input type="checkbox" id="credit-check" /><span>Request one of my available attendance credits for this date.</span></label>
+        <div class="dialog-footer">
+          <button class="danger-link" id="remove-date" value="cancel">Remove date</button>
+          <button class="primary-button" id="save-day" value="default">Save date</button>
+        </div>
+      </form>
+    </dialog>
+    <div class="toast" id="toast" role="status"></div>
+    <script src="./app.js"></script>
+  </body>
+</html>
