@@ -92,16 +92,22 @@ class AttendanceLedger:
         sources.add(source_date)
         return len(sources) != before
 
-    def balance(self, member_id: str) -> int:
-        return len(self.earned_sources.get(member_id, set())) - len(
-            self.spent_events.get(member_id, set())
-        )
+    def balance(self, member_id: str, cycle_date: date | None = None) -> int:
+        earned = self.earned_sources.get(member_id, set())
+        spent = self.spent_events.get(member_id, set())
+        if cycle_date is not None:
+            in_cycle = lambda day: (
+                day.year == cycle_date.year and day.month == cycle_date.month
+            )
+            earned = {day for day in earned if in_cycle(day)}
+            spent = {day for day in spent if in_cycle(day)}
+        return len(earned) - len(spent)
 
     def spend(self, member_id: str, event_date: date) -> None:
         if event_date in self.spent_events.get(member_id, set()):
             raise ValueError("A member may spend at most one credit per event date")
-        if self.balance(member_id) < 1:
-            raise ValueError("Member has no attendance credit available")
+        if self.balance(member_id, event_date) < 1:
+            raise ValueError("Member has no attendance credit available in this month")
         self.spent_events.setdefault(member_id, set()).add(event_date)
 
 
@@ -204,7 +210,7 @@ class Scheduler:
 
             for rank, signup in enumerate(ranked, start=1):
                 stats = self._stats(signup.member_id, event, history.get(signup.member_id))
-                credit = signup.request_credit and ledger.balance(signup.member_id) > 0
+                credit = signup.request_credit and ledger.balance(signup.member_id, event.event_date) > 0
                 is_selected = signup.member_id in selected_ids
                 explanations.append(
                     CandidateExplanation(
