@@ -16,17 +16,25 @@ This project replaces first-click-wins Raid Helper selection with a weighted sys
   - 12 Ship positions
 - Ship signup choices include:
   - Balance
-  - Balance with Nol
+  - Balance with NOL
   - Advance
-  - Advance with Nol
+  - Advance with NOL
   - Improved Sailboat
+  - Improved Sailboat with NOL
   - Improved Frigate
+  - Improved Frigate with NOL
   - Caravel
+  - Caravel with NOL
   - Galleass
+  - Galleass with NOL
   - Valor
+  - Valor with NOL
   - Volante
+  - Volante with NOL
   - Panokseon
+  - Panokseon with NOL
   - Other leadership-approved ship
+  - Other leadership-approved ship with NOL
 - All rankings must be explainable: leadership and members can see the factors that produced selection, waitlist order, and credit use.
 - Ties use a deterministic rotating tiebreaker, not signup speed.
 
