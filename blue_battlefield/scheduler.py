@@ -112,10 +112,9 @@ class CandidateExplanation:
     selected: bool
     rank: int
     credit_applied: bool
-    total_confirmed: int
-    confirmed_in_window: int
-    total_waitlists: int
-    waitlists_in_window: int
+    confirmed_in_month: int
+    waitlists_in_month: int
+    fairness_cycle: str
     rotation_value: int
     policy_version: str
     reason: str
@@ -140,13 +139,14 @@ class ScheduleResult:
 class Scheduler:
     """Deterministic, role-constrained roster selector.
 
-    Ranking is lexicographic: requested available credit, fewer lifetime confirmed
-    appearances, fewer recent confirmed appearances, more lifetime and recent
-    waitlists, then a rotating deterministic tiebreak.
+    Ranking is lexicographic within one calendar month: requested available
+    current-month credit, fewer confirmed appearances, more waitlists, then a
+    rotating deterministic tiebreak. Older months remain auditable but do not rank.
     Signup time is used only to enforce the deadline.
     """
 
-    def __init__(self, rolling_window_days: int = 14) -> None:
+    def __init__(self, rolling_window_days: int | None = None) -> None:
+        # Kept as a compatibility argument; fairness now resets by calendar month.
         self.rolling_window_days = rolling_window_days
 
     def schedule(
@@ -213,10 +213,9 @@ class Scheduler:
                         selected=is_selected,
                         rank=rank,
                         credit_applied=credit and is_selected,
-                        total_confirmed=stats[0],
-                        confirmed_in_window=stats[1],
-                        total_waitlists=stats[2],
-                        waitlists_in_window=stats[3],
+                        confirmed_in_month=stats[0],
+                        waitlists_in_month=stats[1],
+                        fairness_cycle=event.event_date.strftime("%Y-%m"),
                         rotation_value=self._rotation(signup.member_id, event.event_date, role),
                         policy_version=event.policy_version,
                         reason="selected" if is_selected else "capacity reached",
@@ -237,16 +236,17 @@ class Scheduler:
 
     def _stats(
         self, member_id: str, event: Event, history: AttendanceHistory | None
-    ) -> tuple[int, int, int, int]:
+    ) -> tuple[int, int]:
         if not history:
-            return (0, 0, 0, 0)
-        delta = (event.event_date - date.min).days
-        minimum = date.fromordinal(max(1, delta - self.rolling_window_days + 1))
-        historical_confirmed = sum(day < event.event_date for day in history.confirmed_dates)
-        recent_confirmed = sum(minimum <= day < event.event_date for day in history.confirmed_dates)
-        historical_waitlisted = sum(day < event.event_date for day in history.waitlisted_dates)
-        recent_waitlisted = sum(minimum <= day < event.event_date for day in history.waitlisted_dates)
-        return historical_confirmed, recent_confirmed, historical_waitlisted, recent_waitlisted
+            return (0, 0)
+        same_cycle = lambda day: (
+            day < event.event_date
+            and day.year == event.event_date.year
+            and day.month == event.event_date.month
+        )
+        confirmed = sum(same_cycle(day) for day in history.confirmed_dates)
+        waitlisted = sum(same_cycle(day) for day in history.waitlisted_dates)
+        return confirmed, waitlisted
 
     def _rank_key(
         self,
@@ -255,17 +255,13 @@ class Scheduler:
         event: Event,
         ledger: AttendanceLedger,
         history: AttendanceHistory | None,
-    ) -> tuple[int, int, int, int, int, int]:
-        total_confirmed, recent_confirmed, total_waitlisted, recent_waitlisted = self._stats(
-            signup.member_id, event, history
-        )
+    ) -> tuple[int, int, int, int]:
+        confirmed, waitlisted = self._stats(signup.member_id, event, history)
         has_credit = signup.request_credit and ledger.balance(signup.member_id) > 0
         return (
             0 if has_credit else 1,
-            total_confirmed,
-            recent_confirmed,
-            -total_waitlisted,
-            -recent_waitlisted,
+            confirmed,
+            -waitlisted,
             self._rotation(signup.member_id, event.event_date, role),
         )
 
