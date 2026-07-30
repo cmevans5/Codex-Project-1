@@ -168,6 +168,27 @@ class SchedulerTests(unittest.TestCase):
             baseline.assignments[0].member_id, after_reset.assignments[0].member_id
         )
 
+    def test_prior_month_credit_cannot_be_spent_in_new_month(self) -> None:
+        august_event = Event(date(2026, 8, 2), datetime(2026, 8, 1, 18, 0))
+        ledger = AttendanceLedger()
+        ledger.earn("m00", date(2026, 7, 30))
+        result = Scheduler().schedule(
+            august_event,
+            [member(0, frozenset({Role.DRIVER}))],
+            [
+                Signup(
+                    "m00",
+                    (Role.DRIVER,),
+                    datetime(2026, 8, 1, 12, 0),
+                    request_credit=True,
+                )
+            ],
+            ledger,
+        )
+        self.assertFalse(result.assignments[0].credit_spent)
+        self.assertEqual(ledger.balance("m00", august_event.event_date), 0)
+        self.assertEqual(ledger.balance("m00", date(2026, 7, 31)), 1)
+
     def test_saturday_is_rejected(self) -> None:
         with self.assertRaises(ValueError):
             Event(date(2026, 8, 1), DEADLINE)
