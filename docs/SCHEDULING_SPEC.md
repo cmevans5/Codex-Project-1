@@ -69,19 +69,27 @@ Suggested initial rolling window: 14 completed battlefield dates. This remains c
 Accepted signup values:
 
 - Balance
-- Balance with Nol
+- Balance with NOL
 - Advance
-- Advance with Nol
+- Advance with NOL
 - Improved Sailboat
+- Improved Sailboat with NOL
 - Improved Frigate
+- Improved Frigate with NOL
 - Caravel
+- Caravel with NOL
 - Galleass
+- Galleass with NOL
 - Valor
+- Valor with NOL
 - Volante
+- Volante with NOL
 - Panokseon
+- Panokseon with NOL
 - Other leadership-approved ship
+- Other leadership-approved ship with NOL
 
-The data model stores the exact ship type and an optional Nol flag. It must not assume that all ship types are equivalent for future composition rules.
+The data model stores the base ship type and NOL status as separate fields, while the signup interface displays both the standard and `with NOL` choice for every accepted base ship type. It must not assume that all ship types are equivalent for future composition rules.
 
 ## 8. Required records
 
