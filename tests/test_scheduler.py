@@ -130,11 +130,11 @@ class SchedulerTests(unittest.TestCase):
             sum(assignment.member_id == "m00" for assignment in result.assignments), 1
         )
 
-    def test_attendance_outside_recent_window_still_affects_lifetime_fairness(self) -> None:
+    def test_all_earlier_dates_in_same_month_affect_fairness(self) -> None:
         members = [member(i, frozenset({Role.DRIVER})) for i in range(2)]
-        old_date = EVENT.event_date - timedelta(days=90)
-        history = {"m00": AttendanceHistory(confirmed_dates=frozenset({old_date}))}
-        result = Scheduler(rolling_window_days=14).schedule(
+        earlier_date = date(2026, 7, 1)
+        history = {"m00": AttendanceHistory(confirmed_dates=frozenset({earlier_date}))}
+        result = Scheduler().schedule(
             EVENT,
             members,
             [signup(0, Role.DRIVER), signup(1, Role.DRIVER)],
@@ -145,20 +145,28 @@ class SchedulerTests(unittest.TestCase):
         explanation = next(
             item for item in result.explanations if item.member_id == "m00"
         )
-        self.assertEqual(explanation.total_confirmed, 1)
-        self.assertEqual(explanation.confirmed_in_window, 0)
+        self.assertEqual(explanation.confirmed_in_month, 1)
+        self.assertEqual(explanation.fairness_cycle, "2026-07")
 
-    def test_future_history_never_affects_current_ranking(self) -> None:
+    def test_prior_month_history_does_not_affect_new_month(self) -> None:
+        august_event = Event(date(2026, 8, 2), datetime(2026, 8, 1, 18, 0))
         members = [member(i, frozenset({Role.DRIVER})) for i in range(2)]
-        future_date = EVENT.event_date + timedelta(days=1)
-        history = {"m00": AttendanceHistory(confirmed_dates=frozenset({future_date}))}
+        july_history = {
+            "m00": AttendanceHistory(confirmed_dates=frozenset({date(2026, 7, 30)}))
+        }
+        signups = [
+            Signup("m00", (Role.DRIVER,), datetime(2026, 8, 1, 12, 0)),
+            Signup("m01", (Role.DRIVER,), datetime(2026, 8, 1, 12, 0)),
+        ]
         baseline = Scheduler().schedule(
-            EVENT, members, [signup(0, Role.DRIVER), signup(1, Role.DRIVER)], AttendanceLedger()
+            august_event, members, signups, AttendanceLedger()
         )
-        with_future = Scheduler().schedule(
-            EVENT, members, [signup(0, Role.DRIVER), signup(1, Role.DRIVER)], AttendanceLedger(), history
+        after_reset = Scheduler().schedule(
+            august_event, members, signups, AttendanceLedger(), july_history
         )
-        self.assertEqual(baseline.assignments[0].member_id, with_future.assignments[0].member_id)
+        self.assertEqual(
+            baseline.assignments[0].member_id, after_reset.assignments[0].member_id
+        )
 
     def test_saturday_is_rejected(self) -> None:
         with self.assertRaises(ValueError):
