@@ -14,27 +14,20 @@ This project replaces first-click-wins Raid Helper selection with a weighted sys
   - 7 Guild Galley Cannon positions
   - 1 Guild Galley Driver position
   - 12 Ship positions
-- Ship signup choices include:
-  - Balance
-  - Balance with NOL
-  - Advance
-  - Advance with NOL
-  - Improved Sailboat
-  - Improved Sailboat with NOL
-  - Improved Frigate
-  - Improved Frigate with NOL
-  - Caravel
-  - Caravel with NOL
-  - Galleass
-  - Galleass with NOL
-  - Valor
-  - Valor with NOL
-  - Volante
-  - Volante with NOL
+- Ship signup choices are restricted to Carracks, Panokseon, and Epheria Star:
+  - Carrack: Balance
+  - Carrack: Balance with NOL
+  - Carrack: Advance
+  - Carrack: Advance with NOL
+  - Carrack: Valor
+  - Carrack: Valor with NOL
+  - Carrack: Volante
+  - Carrack: Volante with NOL
   - Panokseon
   - Panokseon with NOL
-  - Other leadership-approved ship
-  - Other leadership-approved ship with NOL
+  - Epheria Star
+  - Epheria Star with NOL
+- No other ship types are eligible for a Ship position.
 - All rankings must be explainable: leadership and members can see the factors that produced selection, waitlist order, and credit use.
 - Ties use a deterministic rotating tiebreaker, not signup speed.
 
@@ -49,7 +42,7 @@ This project replaces first-click-wins Raid Helper selection with a weighted sys
 
 ## Repository status
 
-This initial commit establishes the product rules, data contract, scoring design, and acceptance criteria. Implementation work will proceed against those written rules so the project remains testable and auditable.
+This initial specification establishes the product rules, data contract, scoring design, and acceptance criteria. Implementation work will proceed against those written rules so the project remains testable and auditable.
 
 ## Files
 
