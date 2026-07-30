@@ -1,0 +1,2 @@
+member_id,discord_id,family_name,event_date,attendance_status,eligible_absence,notes
+example-001,123456789012345678,ExampleFamily,2026-07-29,absent,true,Example only - delete before import
