@@ -112,7 +112,9 @@ class CandidateExplanation:
     selected: bool
     rank: int
     credit_applied: bool
+    total_confirmed: int
     confirmed_in_window: int
+    total_waitlists: int
     waitlists_in_window: int
     rotation_value: int
     policy_version: str
@@ -138,8 +140,9 @@ class ScheduleResult:
 class Scheduler:
     """Deterministic, role-constrained roster selector.
 
-    Ranking is lexicographic: requested available credit, fewer recent confirmed
-    appearances, more recent waitlists, then a rotating deterministic tiebreak.
+    Ranking is lexicographic: requested available credit, fewer lifetime confirmed
+    appearances, fewer recent confirmed appearances, more lifetime and recent
+    waitlists, then a rotating deterministic tiebreak.
     Signup time is used only to enforce the deadline.
     """
 
@@ -210,8 +213,10 @@ class Scheduler:
                         selected=is_selected,
                         rank=rank,
                         credit_applied=credit and is_selected,
-                        confirmed_in_window=stats[0],
-                        waitlists_in_window=stats[1],
+                        total_confirmed=stats[0],
+                        confirmed_in_window=stats[1],
+                        total_waitlists=stats[2],
+                        waitlists_in_window=stats[3],
                         rotation_value=self._rotation(signup.member_id, event.event_date, role),
                         policy_version=event.policy_version,
                         reason="selected" if is_selected else "capacity reached",
@@ -232,14 +237,16 @@ class Scheduler:
 
     def _stats(
         self, member_id: str, event: Event, history: AttendanceHistory | None
-    ) -> tuple[int, int]:
+    ) -> tuple[int, int, int, int]:
         if not history:
-            return (0, 0)
+            return (0, 0, 0, 0)
         delta = (event.event_date - date.min).days
         minimum = date.fromordinal(max(1, delta - self.rolling_window_days + 1))
-        confirmed = sum(minimum <= day < event.event_date for day in history.confirmed_dates)
-        waitlisted = sum(minimum <= day < event.event_date for day in history.waitlisted_dates)
-        return confirmed, waitlisted
+        historical_confirmed = sum(day < event.event_date for day in history.confirmed_dates)
+        recent_confirmed = sum(minimum <= day < event.event_date for day in history.confirmed_dates)
+        historical_waitlisted = sum(day < event.event_date for day in history.waitlisted_dates)
+        recent_waitlisted = sum(minimum <= day < event.event_date for day in history.waitlisted_dates)
+        return historical_confirmed, recent_confirmed, historical_waitlisted, recent_waitlisted
 
     def _rank_key(
         self,
@@ -248,13 +255,17 @@ class Scheduler:
         event: Event,
         ledger: AttendanceLedger,
         history: AttendanceHistory | None,
-    ) -> tuple[int, int, int, int]:
-        confirmed, waitlisted = self._stats(signup.member_id, event, history)
+    ) -> tuple[int, int, int, int, int, int]:
+        total_confirmed, recent_confirmed, total_waitlisted, recent_waitlisted = self._stats(
+            signup.member_id, event, history
+        )
         has_credit = signup.request_credit and ledger.balance(signup.member_id) > 0
         return (
             0 if has_credit else 1,
-            confirmed,
-            -waitlisted,
+            total_confirmed,
+            recent_confirmed,
+            -total_waitlisted,
+            -recent_waitlisted,
             self._rotation(signup.member_id, event.event_date, role),
         )
 
