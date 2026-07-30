@@ -29,6 +29,8 @@ python -m unittest discover -s tests -v
 - Signup time enforces the deadline but never improves ranking.
 - All eligible ships rank equally. Ship tier, Carrack variant, and NOL ownership
   add no selection weight.
+- Every completed attendance and waitlist outcome is retained permanently and influences future fairness.
+- Recent history is used only after lifetime totals, preventing both long-term imbalance and short-term streaks.
 - Ties use a deterministic rotating value, not signup speed.
 
 ## Eligible player ships
@@ -54,9 +56,11 @@ These ships are eligible without a NOL signup option:
 Each role is filled independently:
 
 1. Requested available attendance credit
-2. Fewer confirmed appearances in the rolling window
-3. More valid waitlists in the rolling window
-4. Deterministic rotating tiebreak
+2. Fewer confirmed appearances across all completed historical dates
+3. Fewer confirmed appearances in the recent rolling window
+4. More valid historical waitlists
+5. More valid waitlists in the recent rolling window
+6. Deterministic rotating tiebreak
 
 Members may volunteer for multiple roles but can receive only one assignment on
 an event date.
