@@ -1,55 +1,81 @@
 # Blue Battlefield Attendance Scheduler
 
-A fair, auditable signup and roster-selection system for **Black Desert Online Blue Battlefield** guild attendance.
+A fair, auditable signup and roster-selection system for **Black Desert Online
+Blue Battlefield** guild attendance. It replaces first-click-wins Raid Helper
+selection with deterministic, role-constrained ranking.
 
-This project replaces first-click-wins Raid Helper selection with a weighted system that rewards members who have missed eligible days while still filling required battlefield roles.
+## Implemented MVP
 
-## Core rules
+The repository now includes a dependency-free Python scheduling engine and tests.
+It produces assignments, ordered role waitlists, rejection reasons, and auditable
+score explanations.
 
-- Blue Battlefield occurs daily.
-- A member earns **one attendance-credit unit for each eligible day they are absent**.
-- A member may spend **at most one unit on one future day**; an absence never guarantees multiple days.
-- Credits raise priority for a day but do not override role eligibility or duplicate-booking rules.
-- Each roster contains exactly 20 positions:
+Run the tests:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+## Governing rules
+
+- Events run Sunday through Friday; Saturday is the guild off day.
+- Each event has exactly 20 available positions:
   - 7 Guild Galley Cannon positions
   - 1 Guild Galley Driver position
-  - 12 Ship positions
-- Ship signup choices are restricted to Carracks, Panokseon, and Epheria Star:
-  - Carrack: Balance
-  - Carrack: Balance with NOL
-  - Carrack: Advance
-  - Carrack: Advance with NOL
-  - Carrack: Valor
-  - Carrack: Valor with NOL
-  - Carrack: Volante
-  - Carrack: Volante with NOL
-  - Panokseon
-  - Panokseon with NOL
-  - Epheria Star
-  - Epheria Star with NOL
-- No other ship types are eligible for a Ship position.
-- All rankings must be explainable: leadership and members can see the factors that produced selection, waitlist order, and credit use.
-- Ties use a deterministic rotating tiebreaker, not signup speed.
+  - 12 Player Ship positions
+- One eligible absence earns one attendance-credit unit.
+- A member can request and spend at most one unit for one future event date.
+- A unit is spent only if the member is selected, never while waitlisted.
+- Signup time enforces the deadline but never improves ranking.
+- All eligible ships rank equally. Ship tier, Carrack variant, and NOL ownership
+  add no selection weight.
+- Ties use a deterministic rotating value, not signup speed.
 
-## Planned workflow
+## Eligible player ships
 
-1. Leadership imports the attendance CSV.
-2. Members sign up for a specific date and eligible role(s).
-3. The scheduler validates roles and calculates priority.
-4. It publishes the 20-person roster plus ordered waitlists.
-5. Attendance is recorded after the event.
-6. Credits are earned or consumed according to the rules in [docs/SCHEDULING_SPEC.md](docs/SCHEDULING_SPEC.md).
+These ships are eligible with standard and NOL signup options:
 
-## Repository status
+- Carrack: Balance
+- Carrack: Advance
+- Carrack: Valor
+- Carrack: Volante
+- Panokseon
 
-This initial specification establishes the product rules, data contract, scoring design, and acceptance criteria. Implementation work will proceed against those written rules so the project remains testable and auditable.
+These ships are eligible without a NOL signup option:
 
-## Files
+- Improved Epheria Sailboat
+- Improved Epheria Frigate
+- Epheria Caravel
+- Epheria Galleass
+- Epheria Star
 
-- [Scheduling specification](docs/SCHEDULING_SPEC.md)
-- [Attendance import template](data/attendance-template.csv)
-- [Implementation roadmap](docs/ROADMAP.md)
+## Selection order
 
-## Project name
+Each role is filled independently:
 
-The current GitHub repository is named `Codex-Project-1`. The intended product name is **Blue Battlefield Attendance Scheduler**.
+1. Requested available attendance credit
+2. Fewer confirmed appearances in the rolling window
+3. More valid waitlists in the rolling window
+4. Deterministic rotating tiebreak
+
+Members may volunteer for multiple roles but can receive only one assignment on
+an event date.
+
+## Repository map
+
+- [`blue_battlefield/scheduler.py`](blue_battlefield/scheduler.py): models,
+  validation, ranking, assignment, waitlists, and explanations
+- [`blue_battlefield/importer.py`](blue_battlefield/importer.py): safe CSV preview
+  and idempotent attendance-credit import
+- [`tests/test_scheduler.py`](tests/test_scheduler.py): automated acceptance tests
+- [`docs/SCHEDULING_SPEC.md`](docs/SCHEDULING_SPEC.md): governing specification
+- [`docs/ACTION_PLAN.md`](docs/ACTION_PLAN.md): phased iteration plan
+- [`docs/ROADMAP.md`](docs/ROADMAP.md): next integration milestones
+- [`data/attendance-template.csv`](data/attendance-template.csv): Excel-compatible
+  attendance import template
+
+## Current boundary
+
+This release implements and tests the domain engine. Persistence, Discord
+components, leadership controls, and live roster publication remain the next
+integration phase.
