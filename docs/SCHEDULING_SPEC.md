@@ -68,28 +68,22 @@ Suggested initial rolling window: 14 completed battlefield dates. This remains c
 
 Accepted signup values:
 
-- Balance
-- Balance with NOL
-- Advance
-- Advance with NOL
-- Improved Sailboat
-- Improved Sailboat with NOL
-- Improved Frigate
-- Improved Frigate with NOL
-- Caravel
-- Caravel with NOL
-- Galleass
-- Galleass with NOL
-- Valor
-- Valor with NOL
-- Volante
-- Volante with NOL
+- Carrack: Balance
+- Carrack: Balance with NOL
+- Carrack: Advance
+- Carrack: Advance with NOL
+- Carrack: Valor
+- Carrack: Valor with NOL
+- Carrack: Volante
+- Carrack: Volante with NOL
 - Panokseon
 - Panokseon with NOL
-- Other leadership-approved ship
-- Other leadership-approved ship with NOL
+- Epheria Star
+- Epheria Star with NOL
 
-The data model stores the base ship type and NOL status as separate fields, while the signup interface displays both the standard and `with NOL` choice for every accepted base ship type. It must not assume that all ship types are equivalent for future composition rules.
+No other ship type is eligible for a Ship position. In particular, the scheduler must reject Improved Sailboat, Improved Frigate, Caravel, Galleass, and free-form or leadership-approved “other” ships.
+
+The data model stores the base ship type, Carrack variant when applicable, and NOL status as separate fields. The signup interface displays both the standard and `with NOL` choice for every accepted ship and Carrack variant. It must not assume that all eligible ship types are equivalent for future composition rules.
 
 ## 8. Required records
 
@@ -162,4 +156,6 @@ Every scheduled member and waitlisted member receives an explanation containing:
 7. Signup timestamp does not alter rank among on-time signups.
 8. Identical candidates resolve deterministically and rotate over time.
 9. A member cannot be assigned to an ineligible role or unaccepted ship.
-10. Every outcome exposes its score components and policy version.
+10. Every accepted ship and Carrack variant has both standard and with-NOL choices.
+11. Improved Sailboat, Improved Frigate, Caravel, Galleass, and “other” ships are rejected.
+12. Every outcome exposes its score components and policy version.
