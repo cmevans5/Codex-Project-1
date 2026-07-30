@@ -1,33 +1,49 @@
 # Implementation Roadmap
 
-## Milestone 1 — Scheduling engine
+## Completed — Domain MVP
 
-- Define typed member, event, signup, ledger, and assignment models.
-- Implement role-constrained ranking.
-- Implement the one-credit-per-day ledger rules.
-- Add deterministic rotation and unit tests for every acceptance criterion.
+- Governing rules reconciled with the original six-day plan.
+- Typed member, event, signup, ship, ledger, assignment, and audit models.
+- Exact 7 cannon / 1 driver / 12 ship role constraints.
+- Lexicographic fairness ranking and deterministic rotation.
+- One-credit-per-member-per-event spending behavior.
+- Idempotent CSV attendance import preview and apply flow.
+- Automated acceptance tests without external dependencies.
 
-## Milestone 2 — Attendance import
+## Next — Persistence and policy hardening
 
-- Validate CSV headings and dates.
-- Make imports idempotent.
-- Produce a preview showing accepted, duplicate, and rejected rows.
-- Require confirmation before writing ledger corrections.
+- Store members, events, signups, ledger entries, assignments, and policy versions.
+- Make scheduling and credit spending one atomic transaction.
+- Add explicit withdrawal, cancellation, no-show, and substitution transitions.
+- Define leadership readiness flags and undersubscribed-role reassignment policy.
+- Expand tests for multi-role volunteers, substitutions, corrections, and concurrency.
 
-## Milestone 3 — Discord workflow
+## Next — Discord workflow
 
-- Create daily signup posts.
-- Allow role and ship selection.
-- Publish roster and waitlists.
-- Send substitutions when a selected member withdraws.
+- Create Sunday-through-Friday signup events.
+- Present role controls and ship choices with compatible NOL options only.
+- Lock submissions at the configured deadline.
+- Publish the 20-person roster, unfilled seats, and ordered waitlists.
+- Promote waitlisted candidates when a selected member withdraws.
 
-## Milestone 4 — Leadership dashboard
+## Next — Leadership and member views
 
-- Review explanations and ledger history.
-- Correct attendance with mandatory reasons.
-- Configure deadlines, rolling window, and role readiness.
-- Export roster, attendance, and audit data.
+- Preview Excel/CSV imports before applying ledger entries.
+- Require reasons for attendance corrections and roster overrides.
+- Display credit balances and complete ledger histories.
+- Display selection explanations and policy versions.
+- Export roster, attendance, and audit records.
+
+## Rollout
+
+1. Replay historical attendance through the importer.
+2. Run the scheduler in shadow mode beside Raid Helper.
+3. Compare outcomes and review edge cases with leadership.
+4. Freeze policy version 1.0.
+5. Switch roster publication authority after a successful pilot.
 
 ## Definition of done
 
-The system is ready for guild use when all acceptance tests pass, the Discord workflow can fill and substitute a complete 20-member roster, and every selection can be reconstructed from stored inputs.
+The system is ready for guild use when it can persist, publish, substitute, record
+attendance, and reconstruct every Sunday-through-Friday result without routine
+manual roster rearrangement.
