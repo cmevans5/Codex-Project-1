@@ -70,11 +70,15 @@ or reassignment policy is configured. The engine must not silently change the
 Version 1 uses lexicographic ranking:
 
 1. Requested and available attendance credit
-2. Fewer confirmed appearances in the rolling window
-3. More valid waitlists in the rolling window
-4. Deterministic rotating value derived from member ID, event date, and role
+2. Fewer confirmed appearances across all completed historical event dates
+3. Fewer confirmed appearances in the recent rolling window
+4. More valid waitlists across all completed historical event dates
+5. More valid waitlists in the recent rolling window
+6. Deterministic rotating value derived from member ID, event date, and role
 
-The initial rolling window is 14 completed event dates and remains configurable.
+Lifetime totals never expire or fall out of the fairness calculation. The recent
+window is a secondary anti-streak measure, initially 14 completed event dates and
+configurable. Only events before the schedule being generated may be counted.
 Ship class, ship tier, Carrack variant, NOL ownership, and signup timestamp never
 contribute priority.
 
@@ -129,6 +133,10 @@ is equally eligible for one of the 12 Player Ship positions.
 
 ### Attendance ledger
 
+The ledger is append-only and retains every historical BBF outcome needed to
+reconstruct lifetime fairness. Corrections supersede prior entries; they do not
+delete history.
+
 - member ID and source event date
 - entry type: earned, spent, correction, expired
 - units, reason, related event/signup
@@ -147,7 +155,8 @@ Each considered candidate receives:
 - role considered
 - selection/waitlist/rejection result and rank
 - whether a credit was requested, available, and spent
-- rolling confirmed appearances and valid waitlists
+- lifetime confirmed appearances and valid waitlists
+- recent-window confirmed appearances and valid waitlists
 - deterministic rotation value
 - eligibility failure reasons
 - policy version
@@ -167,3 +176,5 @@ Each considered candidate receives:
 11. All listed ships remain eligible, with NOL only where specified.
 12. Ship tier, variant, and NOL never change ranking.
 13. Every selection and waitlist outcome exposes ranking factors and policy version.
+14. Attendance older than the recent window still affects ranking through lifetime totals.
+15. Replaying the complete ledger reproduces the same lifetime totals and selection result.
