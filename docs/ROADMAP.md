@@ -5,7 +5,7 @@
 - Governing rules reconciled with the original six-day plan.
 - Typed member, event, signup, ship, ledger, assignment, and audit models.
 - Exact 7 cannon / 1 driver / 12 ship role constraints.
-- Lifetime-first lexicographic fairness ranking, recent anti-streak checks, and deterministic rotation.
+- Calendar-month fairness ranking with deterministic rotation and permanent audit history.
 - One-credit-per-member-per-event spending behavior.
 - Idempotent CSV attendance import preview and apply flow.
 - Automated acceptance tests without external dependencies.
@@ -13,7 +13,8 @@
 ## Next — Persistence and policy hardening
 
 - Store members, events, signups, immutable historical outcome/ledger entries, assignments, and policy versions.
-- Materialize lifetime and recent fairness totals from the complete ledger and verify them by replay.
+- Materialize current-month fairness totals from the complete ledger and verify them by replay.
+- Enforce an automatic first-of-month reset for ranking totals and spendable credits.
 - Make scheduling and credit spending one atomic transaction.
 - Add explicit withdrawal, cancellation, no-show, and substitution transitions.
 - Define leadership readiness flags and undersubscribed-role reassignment policy.
